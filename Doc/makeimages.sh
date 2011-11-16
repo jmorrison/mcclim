@@ -5,7 +5,7 @@
 # types. Uses ImageMagick. If first argument is -e, to not convert,
 # but print a list of the files that are supposed to exist after the
 # script has run.
-if [ "$1" == "-e" ]; then
+if [ "$1" = "-e" ]; then
     NOCREATE="true"
     IMAGES="$2"
     IMAGETARGETTYPES="$3"
@@ -19,7 +19,7 @@ for FILE in $IMAGES; do
         RAWFILE=${FILE%.*}
         for TYPE in $IMAGETARGETTYPES; do
             FILETOMAKE=$RAWFILE.$TYPE
-            if [ "$NOCREATE" == "true" ]; then
+            if [ "$NOCREATE" = "true" ]; then
                 echo $FILETOMAKE
             else
                 if [ ! -f "$FILETOMAKE" ]; then
