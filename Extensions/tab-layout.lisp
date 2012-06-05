@@ -7,6 +7,7 @@
 ;;;    Author: Max-Gerd Retzlaff <m.retzlaff@gmx.net>, http://bl0rg.net/~mgr
 ;;; ---------------------------------------------------------------------------
 ;;;  (c) copyright 2005 by Max-Gerd Retzlaff
+;;;  (c) copyright 2012 by O.Nixie
 ;;;
 ;;; Available from:
 ;;;   http://bl0rg.net/~mgr/flux/tab-layout_2005-09-19_02-52+0200.tar.bz2
@@ -390,7 +391,7 @@ that the frame manager can customize the implementation."))
 
 (defclass tab-bar-pane (application-pane)
   ()
-  (:default-initargs :default-view +tab-bar-view+))
+  (:default-initargs :default-view +tab-bar-view+ :incremental-redisplay t))
 
 (defmethod compose-space ((pane tab-bar-pane) &key width height)
   (declare (ignore width height))
