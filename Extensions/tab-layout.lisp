@@ -406,7 +406,7 @@ that the frame manager can customize the implementation."))
 	  :display-time :command-loop
 	  :display-function
 	  (lambda (frame pane)
-	    (declare (ignore frame))	    
+	    (declare (ignore frame))
 	    (funcall (header-display-function instance) instance pane)))))
     (setf (tab-layout-header-pane instance) header)
     (sheet-adopt-child instance header)
@@ -439,8 +439,7 @@ that the frame manager can customize the implementation."))
 (defmethod internal-child-p (child (parent tab-layout-pane))
   (eq child (tab-layout-header-pane parent)))
 
-(defmethod clim-tab-layout:note-tab-page-changed
-    ((layout tab-layout-pane) page)
+(defmethod note-tab-page-changed ((layout tab-layout-pane) page)
   (redisplay-frame-pane (pane-frame layout)
 			(tab-layout-header-pane layout)
 			#+NIL
@@ -448,3 +447,6 @@ that the frame manager can customize the implementation."))
 			      (car (sheet-children
 				    (tab-layout-header-pane layout)))))
 			:force-p t))
+
+(defmethod handle-event ((pane tab-layout-pane) (event window-repaint-event))
+  (note-tab-page-changed pane nil))
