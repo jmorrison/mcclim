@@ -2,6 +2,7 @@
 
 ;;; (C) Copyright 2003,2008 by Andy Hefner (ahefner@gmail.com)
 ;;; (C) Copyright 2004 by Paolo Amoroso (amoroso@mclink.it)
+;;; (C) Copyright 2012 by O.Nixie (onixie@gmail.com)
 
 ;;; This library is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Library General Public
@@ -1511,6 +1512,8 @@ if you are interested in fixing this."))
 (defparameter *use-background-eval* nil
   "Perform evaluation in a background thread, which can be interrupted.")
 
+(defparameter *disable-eval-error-raise* nil)
+
 (define-command (com-eval :menu t :command-table lisp-commands)
     ((form 'clim:form :prompt "form"))
   (let ((standard-output *standard-output*)
@@ -1525,20 +1528,25 @@ if you are interested in fixing this."))
                    (*debugger-hook* debugger-hook)
 		   (*application-frame* application-frame)
                    error success)
-               (if *use-background-eval*
-                   (unwind-protect (handler-case (prog1 (cons :values (multiple-value-list (eval form)))
-                                                   (setf success t))
-                                     (serious-condition (e)
-                                       (setf error e)
-                                       (error e)))
-                     (when (not success)
-                       (return-from evaluate (cons :error error))))
-                   (cons :values (multiple-value-list (eval form)))))))
+               (if *disable-eval-error-raise*
+		   (handler-case
+		       (cons :values (multiple-value-list (eval form)))
+		     (error (e)
+		       (cons :error e)))
+		   (if *use-background-eval*
+		       (unwind-protect (handler-case (prog1 (cons :values (multiple-value-list (eval form)))
+						       (setf success t))
+					 (serious-condition (e)
+					   (setf error e)
+					   (error e)))
+			 (when (not success)
+			   (return-from evaluate (cons :error error))))
+		       (cons :values (multiple-value-list (eval form))))))))
       ;; If possible, use a thread for evaluation, permitting us to
       ;; interrupt it.
       (let ((start-time (get-internal-real-time)))
         (destructuring-bind (result . value)
-            (if (and *use-background-eval* clim-sys:*multiprocessing-p*)
+            (if (and *use-background-eval* clim-sys:*multiprocessing-p* (not *disable-eval-error-raise*))
                 (catch 'done
                   (let* ((orig-process (clim-sys:current-process))
                          (evaluating t)
