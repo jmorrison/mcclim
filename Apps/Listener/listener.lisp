@@ -99,6 +99,7 @@
                    :inherit-from (application-commands
                                   lisp-commands
                                   asdf-commands
+                                  quicklisp-commands
                                   filesystem-commands
                                   show-commands)
                    :menu (("Listener"   :menu application-commands)
