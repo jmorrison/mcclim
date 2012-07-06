@@ -146,7 +146,7 @@
   (asdf:oos 'asdf:compile-op system)
   (asdf:oos 'asdf:load-op system))
 
-(defmethod mime-type-to-command ((mime-type text/x-lisp-system) pathname)  
-  (values `(com-load-system ,pathname)
-          "Load System"
-          (format nil "Load System ~A" pathname)))
+;; (defmethod mime-type-to-command ((mime-type text/x-lisp-system) pathname)  
+;;   (values `(com-load-system ,pathname)
+;;           "Load System"
+;;           (format nil "Load System ~A" pathname)))

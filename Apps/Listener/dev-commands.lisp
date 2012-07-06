@@ -1232,15 +1232,15 @@ if you are interested in fixing this."))
 
 ;; Move these elsewhere.
 
-(defmethod mime-type-to-command ((mime-type text/x-lisp-source) pathname)
-  (values `(com-compile-and-load ,pathname)
-          "Compile and Load"
-          (format nil "Compile and load ~A" pathname)))
+;; (defmethod mime-type-to-command ((mime-type text/x-lisp-source) pathname)
+;;   (values `(com-compile-and-load ,pathname)
+;;           "Compile and Load"
+;;           (format nil "Compile and load ~A" pathname)))
 
-(defmethod mime-type-to-command ((mime-type application/x-lisp-fasl) pathname)
-  (values `(com-load-file ,pathname)
-          "Load"
-          (format nil "Load ~A" pathname)))
+;; (defmethod mime-type-to-command ((mime-type application/x-lisp-fasl) pathname)
+;;   (values `(com-load-file ,pathname)
+;;           "Load"
+;;           (format nil "Load ~A" pathname)))
 
 ;; I've taken to doing translator documentation exactly opposite of how the CLIM
 ;; spec seems to intend. The spec says that the pointer-documentation should be
