@@ -1,5 +1,5 @@
 (defpackage clim-system-browser
-  (:use :clim-lisp :clim :sb-mop :climacs))
+  (:use :clim-lisp :clim :sb-mop :climacs :clim-extensions))
 
 (in-package :clim-system-browser)
 
@@ -194,22 +194,17 @@
   
 (defun package-pane-changed (pane value)
   (setf (current-package *application-frame*) value)
-  (setf (value (categories-pane *application-frame*))
-        (first *categories*)))
+  (let ((categories-pane (find-pane-named *application-frame* 'categories-pane)))
+    (categories-pane-changed categories-pane
+                             (first *categories*))))
 
 (defun categories-pane-changed (pane value)
   (setf (current-category *application-frame*) value)
-  (setf (elements-pane *application-frame*)
-        (let ((elements (list-elements (current-package *application-frame*)
-                                       (current-category *application-frame*))))
-          (labelling (:label "Elements")
-            (make-pane 'list-pane
-                       :value (first elements)
-                       :items elements
-                       :mode :exclusive
-                       :value-changed-callback #'elements-pane-changed
-                       ;:name-key #'symbol-name
-                       )))))
+  (let ((category-elements (list-elements (current-package *application-frame*)
+                                          (current-category *application-frame*)))
+        (elements-pane (find-pane-named *application-frame* 'elements-pane)))
+    (setf (list-pane-items elements-pane) category-elements)
+    (setf (gadget-value elements-pane) (first category-elements))))
 
 (defun elements-pane-changed (pane value))
 
@@ -230,3 +225,4 @@
 
 (run-frame-top-level
  (make-application-frame 'clim-system-browser))
+
