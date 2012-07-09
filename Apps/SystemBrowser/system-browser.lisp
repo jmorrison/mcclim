@@ -194,23 +194,33 @@
   
 (defun package-pane-changed (pane value)
   (setf (current-package *application-frame*) value)
-  (let ((categories-pane (find-pane-named *application-frame* 'categories-pane)))
-    (categories-pane-changed categories-pane
-                             (first *categories*))))
+  (let ((categories-pane (find-pane-named *application-frame* 'categories-pane))
+        (first-category (first *categories*)))
+      (setf (gadget-value categories-pane) first-category)))
 
 (defun categories-pane-changed (pane value)
   (setf (current-category *application-frame*) value)
   (let ((category-elements (list-elements (current-package *application-frame*)
                                           (current-category *application-frame*)))
         (elements-pane (find-pane-named *application-frame* 'elements-pane)))
+    (setf (gadget-value elements-pane) (first category-elements))
     (setf (list-pane-items elements-pane) category-elements)
-    (setf (gadget-value elements-pane) (first category-elements))))
+    ))
 
-(defun elements-pane-changed (pane value))
+(defun elements-pane-changed (pane value)
+  (setf (current-element *application-frame*) value)
+  (redisplay-frame-pane *application-frame* (get-frame-pane *application-frame* 'definition-pane) :force-p t))
 
 (defun display-definition-pane (frame pane)
-  (with-open-file (stream #p"/home/marian/src/lisp/quicklisp.lisp" :direction :input)
-    (cl-fad:copy-stream stream pane)))
+  (when (current-element frame)
+    (when (equalp (current-category frame) :class)
+      (let ((class-symbol (intern (symbol-name (current-element frame)) (current-package frame))))
+        (let ((location (swank::find-source-location (find-class class-symbol))))
+          (let ((snippet (cadr (nth 3 location))))
+            (format pane "~A" snippet))))))
+  #+nil(with-open-file (stream #p"/home/marian/src/lisp/quicklisp.lisp" :direction :input)
+    (cl-fad:copy-stream stream pane))
+  )
 
 (defmethod esa-buffer::frame-make-buffer-from-stream ((application-frame clim-system-browser) stream)
   (let* ((buffer (esa-buffer::make-new-buffer)))
@@ -225,4 +235,3 @@
 
 (run-frame-top-level
  (make-application-frame 'clim-system-browser))
-
