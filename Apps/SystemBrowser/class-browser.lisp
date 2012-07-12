@@ -62,9 +62,16 @@
              do
                (progn
                  (with-output-as-presentation (pane subclass 'class-presentation)
-                   (format pane "~A " (sb-mop::class-name subclass)))
+                   (format pane "~A" (sb-mop::class-name subclass)))
                  (format pane " "))))
-      (terpri pane))))
+      (terpri pane) (terpri pane)
+      (render-attribute "Direct methods:")
+      (if (not (sb-mop::specializer-direct-methods class))
+          (format pane "None")
+          (loop for method in (sb-mop::specializer-direct-methods class)
+               do (progn
+                    (format pane "~A" method)
+                    (format pane " ")))))))
 
 (define-clim-class-browser-command (com-inspect-superclasses :name "Superclasses" :menu t) ()
   (run-frame-top-level (make-application-frame 'clim-class-browser::class-browser
