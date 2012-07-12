@@ -17,7 +17,10 @@
 (define-application-frame class-browser ()
   ((classes :initarg :classes
             :initform (list (find-class 'climi::basic-pane))
-            :accessor classes))
+            :accessor classes)
+   (navigate :initarg :navigate
+             :initform :subclasses
+             :accessor navigate))
   (:pointer-documentation t)
   (:panes
    (app :application
@@ -75,8 +78,9 @@
               (terpri)) )))
      #'(lambda (node)
          (if (member node *expanded*)
-             (sb-mop:class-direct-subclasses node)
-             ;(sb-mop:class-direct-superclasses node)
+             (ecase (navigate *application-frame*)
+               (:subclasses (sb-mop:class-direct-subclasses node))
+               (:superclasses (sb-mop:class-direct-superclasses node)))
              nil))
      :cutoff-depth nil
      :graph-type :tree

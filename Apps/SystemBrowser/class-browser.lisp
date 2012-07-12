@@ -36,7 +36,7 @@
       (terpri pane)
       (render-attribute "Description:")
 ;      (format pane "~A" (or (documentation class nil) "Not documented"))
-;      (terpri pane)
+      (terpri pane)
       (render-attribute "Slots:")
       (loop for slot in (sb-mop:class-direct-slots class)
          do
@@ -45,22 +45,36 @@
            (terpri pane)))
       (terpri pane)
       (render-attribute "Direct superclasses:")
-      (loop for superclass in (sb-mop::class-direct-superclasses class)
-         do
-         (progn
-           (with-output-as-presentation (pane superclass 'class-presentation)
-             (format pane "~A" (sb-mop::class-name superclass)))
-           (format pane " ")))
+      (if (not (sb-mop::class-direct-superclasses class))
+          (format pane "None")
+          (loop for superclass in (sb-mop::class-direct-superclasses class)
+             do
+               (progn
+                 (with-output-as-presentation (pane superclass 'class-presentation)
+                   (format pane "~A" (sb-mop::class-name superclass)))
+                 (format pane " "))))
       (terpri pane)
       (terpri pane)
       (render-attribute "Direct subclasses:")
-      (loop for subclass in (sb-mop::class-direct-subclasses class)
-         do
-           (progn
-             (with-output-as-presentation (pane subclass 'class-presentation)
-               (format pane "~A " (sb-mop::class-name subclass)))
-             (format pane " ")))
+      (if (not (sb-mop::class-direct-subclasses class))
+          (format pane "None")
+          (loop for subclass in (sb-mop::class-direct-subclasses class)
+             do
+               (progn
+                 (with-output-as-presentation (pane subclass 'class-presentation)
+                   (format pane "~A " (sb-mop::class-name subclass)))
+                 (format pane " "))))
       (terpri pane))))
+
+(define-clim-class-browser-command (com-inspect-superclasses :name "Superclasses" :menu t) ()
+  (run-frame-top-level (make-application-frame 'clim-class-browser::class-browser
+                                               :class (browser-class *application-frame*)
+                                               :navigate :superclasses)))
+
+(define-clim-class-browser-command (com-inspect-subclasses :name "Subclasses" :menu t) ()
+  (run-frame-top-level (make-application-frame 'clim-class-browser::class-browser
+                                               :class (browser-class *application-frame*)
+                                               :navigate :subclasses)))
 
 (define-clim-class-browser-command com-inspect-class ((class t))
   (run-frame-top-level
