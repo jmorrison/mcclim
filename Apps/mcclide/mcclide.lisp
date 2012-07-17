@@ -7,7 +7,7 @@
                         :initform nil))
   (:panes
    (projects-navigator (make-pane 'projects-navigator-pane))
-   (source-files (make-pane 'source-files-pane))
+   (source-files :text-editor-pane)
    (repl (make-pane 'repl-pane))
    (output :application-pane)
    (interactor :interactor-pane))
