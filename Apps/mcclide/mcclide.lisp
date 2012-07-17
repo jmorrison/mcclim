@@ -29,12 +29,16 @@
   (:layouts
    (default
        (vertically (:width 500 :height 500)
-         (4/5
+         (4/6
           (horizontally ()
             (1/5 projects-navigator)
+            (make-pane 'clim-extensions:box-adjuster-gadget)
             (4/5 source-files)))
-         (1/5
-          repl)))))
+         (make-pane 'clim-extensions:box-adjuster-gadget)
+         (1/6
+          repl)
+         (make-pane 'clim-extensions:box-adjuster-gadget)
+         (1/6 interactor)))))
 
 (defclass projects-navigator-pane (application-pane)
   ())
