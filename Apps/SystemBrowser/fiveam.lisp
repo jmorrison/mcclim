@@ -148,5 +148,6 @@
     (setf (tests-to-run *application-frame*) new-tests-to-run)
     (setf (gadget-value tests-pane) new-tests-to-run))))
 
-(run-frame-top-level
- (make-application-frame 'fiveam-test-runner))
+(defun test-runner ()
+  (run-frame-top-level
+   (make-application-frame 'fiveam-test-runner)))
