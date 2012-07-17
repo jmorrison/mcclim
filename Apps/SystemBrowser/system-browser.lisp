@@ -232,6 +232,6 @@
                                   &key (name "*scratch*"))
   (make-instance 'climacs::climacs-buffer :name name))
 
-
-(run-frame-top-level
- (make-application-frame 'clim-system-browser))
+(defun system-browser ()
+  (run-frame-top-level
+   (make-application-frame 'clim-system-browser)))
