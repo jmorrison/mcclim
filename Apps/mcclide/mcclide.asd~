@@ -1,0 +1,5 @@
+(defpackage :mcclide.system
+  (:use :asdf :cl))
+
+(in-package :mcclide.system)
+
