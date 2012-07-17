@@ -76,7 +76,8 @@
     :menu (("ASDF" :menu asdf-commands)
            ("Quicklisp" :menu quicklisp-commands)
            ("Tests runner" :command com-run-test-runner)
-           ("System browser" :command com-run-system-browser)))
+           ("System browser" :command com-run-system-browser)
+           ("Version control" :menu version-control-commands)))
 
 (define-command (com-run-test-runner :command-table tools-commands)
     ()
@@ -118,6 +119,13 @@
 (define-command (com-open-project :name "Open project"
                                   :command-table project-commands
                                   :menu t)
+    ())
+
+(define-command-table version-control-commands :inherit-from nil)
+
+(define-command (com-repository-status :name "Repository status"
+                                       :command-table version-control-commands
+                                       :menu t)
     ())
 
 (defun mcclide ()
