@@ -8,6 +8,7 @@
   (:panes
    (projects-navigator (make-pane 'projects-navigator-pane))
    (source-files :text-editor-pane)
+   (source-file-2 :text-editor-pane)
    (repl (make-pane 'repl-pane))
    (output :application-pane)
    (interactor :interactor-pane))
@@ -33,7 +34,10 @@
           (horizontally ()
             (1/5 projects-navigator)
             (make-pane 'clim-extensions:box-adjuster-gadget)
-            (4/5 source-files)))
+            (4/5
+             (clim-tab-layout:with-tab-layout ('clim-tab-layout:tab-page :name 'source-files-layout :height 500)
+               ("ex1.lisp" source-files)
+               ("ex2.lisp" source-file-2)))))
          (make-pane 'clim-extensions:box-adjuster-gadget)
          (1/6
           repl)
