@@ -57,7 +57,7 @@
 
 (define-command-table lisp-interaction-commands :inherit-from nil)
 
-(define-command (com-lisp--evaluate :name "Evaluate"
+(define-command (com-lisp-evaluate :name "Evaluate"
                                    :command-table lisp-interaction-commands
                                    :menu t)
     ())
@@ -68,6 +68,21 @@
     ())
 
 (define-command (com-lisp-describe :name "Describe"
+                                   :command-table lisp-interaction-commands
+                                   :menu t)
+    ())
+
+(define-command (com-lisp-apropos :name "Apropos"
+                                   :command-table lisp-interaction-commands
+                                   :menu t)
+    ())
+
+(define-command (com-lisp-whocalls :name "Who calls"
+                                   :command-table lisp-interaction-commands
+                                   :menu t)
+    ())
+
+(define-command (com-lisp-jump-to-definition :name "Jump to definition"
                                    :command-table lisp-interaction-commands
                                    :menu t)
     ())
