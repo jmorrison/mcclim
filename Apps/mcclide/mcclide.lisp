@@ -9,10 +9,10 @@
    (projects-navigator (make-pane 'projects-navigator-pane))
    (source-files :text-editor-pane)
    (source-file-2 :text-editor-pane)
-   (repl (make-pane 'repl-pane))
+   (lisp-interaction (make-pane 'lisp-interaction-pane))
    (output :application-pane)
    (interactor :interactor-pane))
-  (:command-table (mcclide-commands
+  (:command-table (mcclide
                    :inherit-from (file-commands
                                   edit-commands
                                   help-commands
@@ -23,7 +23,7 @@
                    :menu (("File" :menu file-commands)
                           ("Project" :menu project-commands)
                           ("Edit" :menu edit-commands)
-                          ("Repl" :menu repl-commands)
+                          ("Lisp" :menu lisp-interaction-commands)
                           ("Tools" :menu tools-commands)
                           ("Help" :menu help-commands))))
   (:menu-bar t)
@@ -40,7 +40,7 @@
                ("ex2.lisp" source-file-2)))))
          (make-pane 'clim-extensions:box-adjuster-gadget)
          (1/6
-          repl)
+          lisp-interaction)
          (make-pane 'clim-extensions:box-adjuster-gadget)
          (1/6 interactor)))))
 
@@ -50,25 +50,25 @@
 (defclass source-files-pane (application-pane)
   ())
 
-(defclass repl-pane (application-pane)
+(defclass lisp-interaction-pane (application-pane)
   ())
 
 (define-command-table project-commands :inherit-from nil)
 
-(define-command-table repl-commands :inherit-from nil)
+(define-command-table lisp-interaction-commands :inherit-from nil)
 
-(define-command (com-repl-evaluate :name "Evaluate"
-                                   :command-table repl-commands
+(define-command (com-lisp--evaluate :name "Evaluate"
+                                   :command-table lisp-interaction-commands
                                    :menu t)
     ())
 
-(define-command (com-repl-inspect :name "Inspect"
-                                  :command-table repl-commands
+(define-command (com-lisp-inspect :name "Inspect"
+                                  :command-table lisp-interaction-commands
                                   :menu t)
     ())
 
-(define-command (com-repl-describe :name "Describe"
-                                   :command-table repl-commands
+(define-command (com-lisp-describe :name "Describe"
+                                   :command-table lisp-interaction-commands
                                    :menu t)
     ())
 
