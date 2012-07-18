@@ -1,6 +1,7 @@
 (in-package :clim-internals)
 
 (defvar *clim-inspector-enabled* nil)
+(defparameter *inspect-with-clouseau* t)
 
 (defun enable-clim-inspector ()
   (setf *clim-inspector-enabled* t))
@@ -27,4 +28,6 @@
 (defmethod handle-event :after (sheet (event pointer-button-press-event))
   (when *clim-inspector-enabled*
     (when (eql (event-modifier-state event) +shift-key+)
-      (swank:inspect-in-emacs sheet))))
+      (if *inspect-with-clouseau*
+          (clouseau:inspector sheet :new-process t)
+          (swank:inspect-in-emacs sheet)))))
