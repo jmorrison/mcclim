@@ -99,5 +99,6 @@
 (defun display-class-graph (frame pane)
   )
 
-(run-frame-top-level
- (make-application-frame 'clim-class-browser :class (find-class 'clim::basic-pane)))
+(defun run-class-browser (class)
+  (run-frame-top-level
+   (make-application-frame 'clim-class-browser :class class)))
