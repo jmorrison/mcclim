@@ -92,7 +92,16 @@
 (define-command (com-about-mcclide :name "About"
                                    :command-table help-commands
                                    :menu t)
-    ())
+    ()
+  (run-frame-top-level
+   (make-application-frame 'about-dialog)))
+
+(define-command (com-room :name "Room"
+                          :command-table help-commands
+                          :menu t)
+    ()
+  (run-frame-top-level
+   (make-application-frame 'room-dialog)))
 
 (define-command-table tools-commands
     :inherit-from nil
@@ -120,7 +129,8 @@
 (define-command (com-open-file :name "Open file"
                                :command-table file-commands
                                :menu t)
-    ())
+    ()
+  (file-selector:select-file :own-window t :pathname-type "lisp" :style 'list))
 
 (define-command-table edit-commands :inherit-from nil)
 
@@ -151,6 +161,47 @@
                                        :menu t)
     ())
 
+(define-application-frame room-dialog ()
+  ()
+  (:panes
+   (info-pane :application-pane
+              :width 500 :height 500
+              :display-function (lambda (frame pane)
+                                  (declare (ignore frame))
+                                  (let ((*standard-output* pane))
+                                    (room))))
+   (accept-button :push-button
+                  :label "Accept"
+                  :activate-callback (lambda (button)
+                                    (declare (ignore button))
+                                    (frame-exit *application-frame*))))
+  (:layouts
+   (default
+       (vertically ()
+         info-pane
+         accept-button))))
+
+(defparameter +about-message+ "A wanabe Common Lisp IDE implemented on McCLIM")
+
+(define-application-frame about-dialog ()
+  ()
+  (:panes
+   (about-pane :application-pane
+               :width 500 :height 500
+               :display-function (lambda (frame pane)
+                                   (declare (ignore frame))
+                                   (format pane +about-message+)))
+   (accept-button :push-button
+                  :label "Accept"
+                  :activate-callback (lambda (button)
+                                    (declare (ignore button))
+                                    (frame-exit *application-frame*))))
+  (:layouts
+   (default
+       (vertically ()
+         about-pane
+         accept-button))))
+  
 (defun mcclide ()
   (run-frame-top-level
    (make-application-frame 'mcclide)))
