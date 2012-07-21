@@ -1,16 +1,16 @@
 (in-package :clim-demo)
 
-(define-application-frame tree-test
-    () ()
-    (:panes
+(define-application-frame tree-test ()
+  ((tree :initarg :tree
+         :accessor tree
+         :initform (simple-tree)))
+  (:panes
      (substring :text-field :value "INTER")
      (result-list
       (make-pane 'climi::tree-pane
 		 :value 'clim:region-intersection
-		 :model (simple-tree)
-                 :opened-nodes (list "Level1A" "Level2B")
-		 ;:presentation-type-key (constantly 'list-test-symbol)
-		 :name-key #'identity
+		 :model (tree *application-frame*)
+                 ;:presentation-type-key (constantly 'list-test-symbol)
                  :test #'equalp))
      (interactor :interactor :height 200))
     (:layouts
@@ -61,3 +61,6 @@
 
 (clim::run-frame-top-level
  (clim::make-application-frame 'tree-test))
+
+(clim::run-frame-top-level
+ (clim::make-application-frame 'tree-test :tree (subclasses-tree (find-class 'standard-object))))
