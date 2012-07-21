@@ -19,13 +19,14 @@
                             :text-style (make-text-style :sans-serif :roman :normal))
            (vertically ()
 	     (scrolling (:height 200)
-	       result-list)
-	     (horizontally ()
+	       result-list
+               )
+	     #+ignore(horizontally ()
 	       substring
 	       (make-pane 'push-button
 			  :label "Update"
 			  :activate-callback 'update-list-test))
-	     interactor)))))
+	     #+ignore interactor)))))
 
 (define-presentation-type list-test-symbol ())
 
