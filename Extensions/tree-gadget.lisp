@@ -166,7 +166,7 @@
                             :max-width +fill+ :max-height +fill+))
   (make-space-requirement :width 500 :height 500
                           :min-width 500 :min-height 500
-                          :max-width 500 :max-height 500))
+                          :max-width +fill+ :max-height +fill+))
 
 (defmethod allocate-space ((pane generic-tree-pane) w h)
   (resize-sheet pane w h))
@@ -235,6 +235,13 @@
 
 (defmethod handle-repaint ((pane generic-tree-pane) region)
   (declare (ignore region))
+  ;; Clear the pane first
+  ;; Use this for fixing list-pane redisplays too?
+  (with-bounding-rectangle* (x0 y0 x1 y1) (sheet-region pane)
+    (draw-rectangle* pane x0 y0 x1 y1
+                     :filled t
+                     :ink (pane-background pane)))
+  
   (paint-generic-tree-pane-node
    (tree-pane-model pane)
    pane
