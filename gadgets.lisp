@@ -1970,6 +1970,12 @@ selection via the control modifier.")
   (generic-list-pane-item-height pane))
 
 (defmethod handle-repaint ((pane generic-list-pane) region)
+  ;; Clear the region first. 
+  (with-bounding-rectangle* (x0 y0 x1 y1) (sheet-region pane)
+    (draw-rectangle* pane x0 y0 x1 y1
+                     :filled t
+                     :ink (pane-background pane)))
+  
   (with-bounding-rectangle* (sx0 sy0 sx1 sy1) (sheet-region pane)
     (declare (ignore sx1 sy1))
     (with-bounding-rectangle* (rx0 ry0 rx1 ry1)
