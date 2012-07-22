@@ -11,7 +11,8 @@
 		 :value 'clim:region-intersection
 		 :model (tree *application-frame*)
                  ;:presentation-type-key (constantly 'list-test-symbol)
-                 :test #'equalp))
+                 :test #'equalp
+                 :item-padding (climi::make-padding 5 5 5 5)))
      (interactor :interactor :height 200))
     (:layouts
      (defaults

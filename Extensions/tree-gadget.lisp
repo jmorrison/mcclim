@@ -2,6 +2,24 @@
 
 ;; sheet-padding mixin
 
+(defun padding-top (padding)
+  (first padding))
+
+(defun padding-right (padding)
+  (second padding))
+
+(defun padding-bottom (padding)
+  (third padding))
+
+(defun padding-left (padding)
+  (nth 3 padding))
+
+(defun make-empty-padding ()
+  (list 0 0 0 0))
+
+(defun make-padding (top right bottom left)
+  (list top right bottom left))
+
 (defclass sheet-padding-mixin ()
   ((sheet-padding-top :initarg :sheet-padding-top
                       :accessor sheet-padding-top
@@ -135,10 +153,6 @@
 			  :initform (constantly nil)
 			  :reader tree-pane-presentation-type-key
 			  :documentation "A function to be applied to items to find the presentation types for their values, or NIL.")
-   (indentation :initarg :indentation
-                :initform 10
-                :accessor indentation
-                :documentation "Indentation size for displaying the tree")
    (test        :initarg :test
                 :initform #'eql
                 :reader tree-pane-test
@@ -184,10 +198,35 @@
                  :accessor opened-nodes)
    (last-action  :initform nil
                  :documentation "Last action performed on items in the pane, either
-:select, :deselect, or NIL if none has been performed yet."))
+:select, :deselect, or NIL if none has been performed yet.")
+   (indentation :initarg :indentation
+                :initform 10
+                :accessor indentation
+                :documentation "Indentation size for displaying the tree")
+   (item-icon-function :initarg :item-icon-function
+                       :initform (lambda (item)
+                                   (declare (ignore item))
+                                   nil)
+                       :accessor item-icon-function)
+   (item-icon-size :initarg :item-icon-size
+                   :initform nil
+                   :accessor item-icon-size)
+   (item-padding :initarg :item-padding
+                 :initform (make-empty-padding)
+                 :accessor item-padding
+                 :documentation "The displayed items padding")
+   (item-arrow-padding :initarg :item-arrow-padding
+                       :accessor item-arrow-padding
+                       :initform (make-empty-padding))
+   (item-name-padding :initarg :item-name-padding
+                      :initform (make-empty-padding)
+                      :accessor item-name-padding)
+   (item-icon-padding :initarg :item-icon-padding
+                      :initform (make-empty-padding)
+                      :accessor item-icon-padding))
   (:default-initargs :text-style (make-text-style :sans-serif :roman :normal)
     :background +white+ :foreground +black+
-    :sheet-padding (list 20 20 20 20)))
+    :sheet-padding (make-padding 5 5 5 5)))
 
 (defmethod initialize-instance :after ((gadget meta-tree-pane) &rest rest)
   (declare (ignorable rest))
@@ -255,24 +294,29 @@
   )
 
 (defmethod generic-tree-pane-item-height ((pane generic-tree-pane))
-  (+ (text-style-ascent  (pane-text-style pane) pane)
-     (text-style-descent (pane-text-style pane) pane)))
+  (+ (padding-top (item-padding pane))
+     (text-style-ascent  (pane-text-style pane) pane)
+     (text-style-descent (pane-text-style pane) pane)
+     (padding-bottom (item-padding pane))))
 
 (defmethod compose-space ((pane generic-tree-pane) &key width height)
   (declare (ignore width height))
 
-  (let ((node (tree-pane-model pane))
-        (opened-nodes (opened-nodes pane))
-        (indentation (indentation pane))
-        (name-key (tree-pane-name-key pane))
-        (test (tree-pane-test pane))
-        (node-height (+ (text-style-ascent  (pane-text-style pane) pane)
-                        (text-style-descent (pane-text-style pane) pane))))
+  (let* ((node (tree-pane-model pane))
+         (opened-nodes (opened-nodes pane))
+         (indentation (indentation pane))
+         (name-key (tree-pane-name-key pane))
+         (test (tree-pane-test pane))
+         (item-padding (item-padding pane))
+         (item-name-padding (item-name-padding pane))
+         (item-icon-padding (item-icon-padding pane))
+         (item-arrow-padding (item-arrow-padding pane)))
     (labels ((node-width (node indentation)
-               (+ indentation
+               (+ (padding-left item-padding)
+                  indentation
                   (text-size (sheet-medium pane)
                              (funcall name-key node))
-                  20))
+                  (padding-right item-padding)))
              (tree-width (tree current-indentation)
                (with-tree-node (node children) tree
                  (max (node-width node current-indentation)
@@ -285,11 +329,11 @@
                           0))))
              (tree-height (tree)
                (with-tree-node (node children) tree
-                 (+ node-height
-                   (apply #'+
-                          (cons 0
-                                (and (member node opened-nodes :test test)
-                                     (mapcar #'tree-height children))))))))
+                 (+ (generic-tree-pane-item-height pane)
+                    (apply #'+
+                           (cons 0
+                                 (and (member node opened-nodes :test test)
+                                      (mapcar #'tree-height children))))))))
       (let ((w (tree-width node 0))
             (h (tree-height node)))
         (make-space-requirement :width w     :height h
@@ -305,7 +349,8 @@
 (defun paint-generic-tree-pane-node (node pane region current-indentation indentation)
   (with-bounding-rectangle* (x0 y0 x1 y1) region
     (let ((item-height (generic-tree-pane-item-height pane))
-          (highlight-ink (tree-pane-highlight-ink pane)))
+          (highlight-ink (tree-pane-highlight-ink pane))
+          (item-padding (item-padding pane)))
       (with-tree-node (value children) node
         (multiple-value-bind (background foreground)
             (cond ((not (slot-boundp pane 'value))
@@ -326,10 +371,12 @@
           ;; Draw corresponding arrow
           (let* ((arrow-width 8)
                  (arrow-height 8)
-                 (arrow-region (make-bounding-rectangle (+ x0 current-indentation)
-                                                        (+ y0 2)
-                                                        (+ x0 current-indentation arrow-width)
-                                                        (+ y0 2 arrow-height))))
+                 (arrow-x (+ x0 current-indentation))
+                 (arrow-y (- (+ y0 (/ item-height 2)) (/ arrow-height 2)))
+                 (arrow-region (make-bounding-rectangle arrow-x
+                                                        arrow-y
+                                                        (+ arrow-x arrow-width)
+                                                        (+ arrow-y arrow-height))))
             (when (node-children node)
               (if (member value (opened-nodes pane) :test (tree-pane-test pane))
                   (draw-down-arrow pane arrow-region)
@@ -338,7 +385,8 @@
             ;; Draw the item text
             (draw-text* pane (funcall (tree-pane-name-key pane) value)
                         (+ x0 current-indentation arrow-width 5)
-                        (+ y0 (text-style-ascent (pane-text-style pane) pane))
+                        (+ y0 (text-style-ascent (pane-text-style pane) pane)
+                           (padding-top item-padding))
                       :ink foreground
                       :text-style (pane-text-style pane)))
 
