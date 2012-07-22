@@ -1004,10 +1004,11 @@ order to produce a double-click")
   ;;
   ;; --GB 2003-03-16
   (declare (ignore space-req-keys resize-frame))
-  (let ((w (space-requirement-width (compose-space pane)))
-        (h (space-requirement-height (compose-space pane))))
-    (resize-sheet pane w h)
-    (allocate-space pane w h) ))
+  (let ((space-requirement (compose-space pane)))
+    (let ((w (space-requirement-width space-requirement))
+          (h (space-requirement-height space-requirement)))
+      (resize-sheet pane w h)
+      (allocate-space pane w h))))
 
 ;;;; box-layout-mixin
 
