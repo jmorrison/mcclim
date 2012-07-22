@@ -68,7 +68,7 @@
     (cons value 
           (when (member value opened-nodes :test test)
             (loop for child in children appending
-                 (extended-tree child opened-nodes :test test))))))
+                 (flatten-tree child opened-nodes :test test))))))
 
 (defclass generic-tree-pane (tree-pane meta-tree-pane
                                        standard-sheet-input-mixin ;; Hmm..
