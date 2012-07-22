@@ -157,16 +157,41 @@
 
 (defmethod compose-space ((pane generic-tree-pane) &key width height)
   (declare (ignore width height))
-  #+ignore
-  (let* ((n (generic-tree-pane-items-length pane))
-         (w (generic-tree-pane-items-width pane))
-         (h (* n (generic-tree-pane-item-height pane))))
-    (make-space-requirement :width w     :height h
-                            :min-width w :min-height h
-                            :max-width +fill+ :max-height +fill+))
-  (make-space-requirement :width 500 :height 500
-                          :min-width 500 :min-height 500
-                          :max-width +fill+ :max-height +fill+))
+
+  (let ((node (tree-pane-model pane))
+        (opened-nodes (opened-nodes pane))
+        (indentation (indentation pane))
+        (name-key (tree-pane-name-key pane))
+        (test (tree-pane-test pane))
+        (node-height (+ (text-style-ascent  (pane-text-style pane) pane)
+                        (text-style-descent (pane-text-style pane) pane))))
+    (labels ((node-width (node indentation)
+               (+ indentation
+                  (text-size (sheet-medium pane)
+                             (funcall name-key node))
+                  20))
+             (tree-width (tree current-indentation)
+               (destructuring-bind (node &rest children) tree
+                 (max (node-width node current-indentation)
+                      (or (and (member node opened-nodes :test test)
+                               (apply #'max
+                                      (cons 0
+                                            (mapcar (lambda (node)
+                                                      (node-width node (+ current-indentation indentation)))
+                                                    children))))
+                          0))))
+             (tree-height (tree)
+               (destructuring-bind (node &rest children) tree
+                 (+ node-height
+                   (apply #'+
+                          (cons 0
+                                (and (member node opened-nodes :test test)
+                                     (mapcar #'tree-height children))))))))
+      (let ((w (tree-width node 0))
+            (h (tree-height node)))
+        (make-space-requirement :width w     :height h
+                                :min-width w :min-height h
+                                :max-width +fill+ :max-height +fill+)))))
 
 (defmethod allocate-space ((pane generic-tree-pane) w h)
   (resize-sheet pane w h))
@@ -344,7 +369,9 @@ Returns two values, the item itself, and the index within the item list."
                      (setf (gadget-value pane :invoke-callback t) (list item-value)
                            last-action :select)
                      (setf last-action (generic-tree-pane-select-item pane item-value)))))
-            (setf last-index index))))))
+            (setf last-index index)))))
+  (change-space-requirements pane)
+  )
 
 (defun generic-tree-pane-handle-click-from-event (pane event)
   (multiple-value-bind (x y) (values (pointer-event-x event) (pointer-event-y event))
