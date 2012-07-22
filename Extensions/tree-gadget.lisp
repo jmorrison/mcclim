@@ -278,9 +278,10 @@
                                                         (+ y0 2)
                                                         (+ x0 current-indentation arrow-width)
                                                         (+ y0 2 arrow-height))))
-            (if (member value (opened-nodes pane) :test (tree-pane-test pane))
-                (draw-down-arrow pane arrow-region)
-                (draw-right-arrow pane arrow-region))
+            (when (node-children node)
+              (if (member value (opened-nodes pane) :test (tree-pane-test pane))
+                  (draw-down-arrow pane arrow-region)
+                  (draw-right-arrow pane arrow-region)))
 
             ;; Draw the item text
             (draw-text* pane (funcall (tree-pane-name-key pane) value)
