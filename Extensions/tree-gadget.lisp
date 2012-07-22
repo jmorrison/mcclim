@@ -34,8 +34,9 @@
   (princ-to-string (directory-pathname node)))
 
 (defmethod node-children ((node directory-node))
-  (mapcar #'make-directory-node
-          (directory (merge-pathnames (directory-pathname node) #p"*"))))
+  (when (not (pathname-name (directory-pathname node)))
+    (mapcar #'make-directory-node
+            (directory (merge-pathnames (directory-pathname node) #p"*")))))
 
 (defun make-directory-node (pathname)
   (make-instance 'directory-node :pathname pathname))
