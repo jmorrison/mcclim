@@ -64,3 +64,6 @@
 
 (clim::run-frame-top-level
  (clim::make-application-frame 'tree-test :tree (subclasses-tree (find-class 'standard-object))))
+
+(clim::run-frame-top-level
+ (clim::make-application-frame 'tree-test :tree (climi::make-directory-node #p"/home/")))

@@ -1,5 +1,55 @@
 (in-package :clim-internals)
 
+; The tree model-api
+
+(defgeneric node-value (node))
+(defgeneric node-children (node))
+
+; The tree model-implementations
+
+;; A list made from lists
+
+(defmethod node-value ((node cons))
+  (car node))
+
+(defmethod node-children ((node cons))
+  (cdr node))
+
+;; A lazy directory tree
+
+(defclass directory-node ()
+  ((directory-pathname :initarg :pathname
+                       :accessor directory-pathname)))
+
+(defmethod initialize-instance :after ((node directory-node) &rest initargs)
+  (let ((directory-pathname (getf initargs :pathname)))
+    (when (not directory-pathname)
+      (error "Provide a directory pathname"))))
+
+(defmethod print-object ((node directory-node) stream)
+  (print-unreadable-object (node stream :type t :identity t)
+    (format stream "~A" (directory-pathname node))))
+
+(defmethod node-value ((node directory-node))
+  (princ-to-string (directory-pathname node)))
+
+(defmethod node-children ((node directory-node))
+  (mapcar #'make-directory-node
+          (directory (merge-pathnames (directory-pathname node) #p"*"))))
+
+(defun make-directory-node (pathname)
+  (make-instance 'directory-node :pathname pathname))
+
+
+;; Convenient model api
+
+(defmacro with-tree-node ((value children) node &body body)
+  (let ((node-var (gensym "NODE-")))
+    `(let ((,node-var ,node)) 
+       (let ((,value (node-value ,node-var))
+             (,children (node-children ,node-var)))
+         ,@body))))
+
 ; The abstract tree-pane
 
 (defclass tree-pane (value-gadget)
@@ -64,7 +114,7 @@
                    :ink ink)))
 
 (defun flatten-tree (node opened-nodes &key (test #'eql))
-  (destructuring-bind (value &rest children) node
+  (with-tree-node (value children) node
     (cons value 
           (when (member value opened-nodes :test test)
             (loop for child in children appending
@@ -119,7 +169,7 @@
   (declare (ignore client gadget-id))
   ;; Maybe act as if a presentation was clicked on, but only if the
   ;; list pane only allows single-selection.
-  (when (or (eq (tree-pane-mode gadget) :one-of)
+  #+ignore(when (or (eq (tree-pane-mode gadget) :one-of)
             (eq (tree-pane-mode gadget) :exclusive))
     (let* ((i (position value (generic-tree-pane-item-values gadget)))
            (item (elt (tree-pane-items gadget) i))
@@ -171,7 +221,7 @@
                              (funcall name-key node))
                   20))
              (tree-width (tree current-indentation)
-               (destructuring-bind (node &rest children) tree
+               (with-tree-node (node children) tree
                  (max (node-width node current-indentation)
                       (or (and (member node opened-nodes :test test)
                                (apply #'max
@@ -181,7 +231,7 @@
                                                     children))))
                           0))))
              (tree-height (tree)
-               (destructuring-bind (node &rest children) tree
+               (with-tree-node (node children) tree
                  (+ node-height
                    (apply #'+
                           (cons 0
@@ -203,7 +253,7 @@
   (with-bounding-rectangle* (x0 y0 x1 y1) region
     (let ((item-height (generic-tree-pane-item-height pane))
           (highlight-ink (tree-pane-highlight-ink pane)))
-      (destructuring-bind (value &rest children) node
+      (with-tree-node (value children) node
         (multiple-value-bind (background foreground)
             (cond ((not (slot-boundp pane 'value))
                    (values (pane-background pane) (pane-foreground pane)))
