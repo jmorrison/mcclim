@@ -1,5 +1,55 @@
 (in-package :clim-internals)
 
+;; sheet-padding mixin
+
+(defclass sheet-padding-mixin ()
+  ((sheet-padding-top :initarg :sheet-padding-top
+                      :accessor sheet-padding-top
+                      :initform 0)
+   (sheet-padding-right :initarg :sheet-padding-right
+                        :accessor sheet-padding-right
+                        :initform 0)
+   (sheet-padding-bottom :initarg :sheet-padding-bottom
+                         :accessor sheet-padding-bottom
+                         :initform 0)
+   (sheet-padding-left :initarg :sheet-padding-left
+                       :accessor sheet-padding-left
+                       :initform 0)))
+
+(defmethod initialize-instance :after ((sheet sheet-padding-mixin) &rest initargs)
+  (when (getf initargs :sheet-padding)
+    (destructuring-bind (padding-top padding-right padding-bottom padding-left)
+        (getf initargs :sheet-padding)
+      (setf (sheet-padding-top sheet) padding-top
+            (sheet-padding-right sheet) padding-right
+            (sheet-padding-bottom sheet) padding-bottom
+            (sheet-padding-left sheet) padding-left))))
+
+(defmethod compose-space :around ((sheet sheet-padding-mixin) &key width height)
+  (let ((space-requirement (call-next-method)))
+    (flet ((padding-width (width)
+             (+ width
+                (sheet-padding-left sheet)
+                (sheet-padding-right sheet)))
+           (padding-height (height)
+             (+ height
+                (sheet-padding-top sheet)
+                (sheet-padding-bottom sheet))))
+      (make-space-requirement :width (padding-width (space-requirement-width space-requirement))
+                              :height (padding-height (space-requirement-height space-requirement))
+                              :min-width (padding-width (space-requirement-min-width space-requirement))
+                              :min-height (padding-height (space-requirement-min-height space-requirement))
+                              :max-width (padding-width (space-requirement-max-width space-requirement))
+                              :max-height (padding-height (space-requirement-max-height space-requirement))))))
+
+(defmethod sheet-padding-region ((sheet sheet-padding-mixin))
+  (let ((region (sheet-region sheet)))
+    (with-bounding-rectangle* (x0 y0 x1 y1) region
+      (make-bounding-rectangle (+ x0 (sheet-padding-left sheet))
+                               (+ y0 (sheet-padding-top sheet))
+                               (- x1 (sheet-padding-right sheet))
+                               (- y1 (sheet-padding-bottom sheet))))))
+
 ; The tree model-api
 
 (defgeneric node-value (node))
@@ -124,7 +174,8 @@
 (defclass generic-tree-pane (tree-pane meta-tree-pane
                                        standard-sheet-input-mixin ;; Hmm..
                                        value-changed-repaint-mixin
-                                       mouse-wheel-scroll-mixin)
+                                       mouse-wheel-scroll-mixin
+                                       sheet-padding-mixin)
   ((highlight-ink :initform +royalblue4+
                   :initarg :highlight-ink
                   :reader tree-pane-highlight-ink)
@@ -135,7 +186,8 @@
                  :documentation "Last action performed on items in the pane, either
 :select, :deselect, or NIL if none has been performed yet."))
   (:default-initargs :text-style (make-text-style :sans-serif :roman :normal)
-    :background +white+ :foreground +black+))
+    :background +white+ :foreground +black+
+    :sheet-padding (list 20 20 20 20)))
 
 (defmethod initialize-instance :after ((gadget meta-tree-pane) &rest rest)
   (declare (ignorable rest))
@@ -292,10 +344,10 @@
 
           ;; Draw the node's children y the node is opened
 
-          (let ((next-region  (make-bounding-rectangle x0
-                                                       (+ y0 item-height)
-                                                       x1
-                                                       y1)))
+          (let ((next-region (make-bounding-rectangle x0
+                                                      (+ y0 item-height)
+                                                      x1
+                                                      y1)))
             (when (member value (opened-nodes pane) :test (tree-pane-test pane))
               (loop
                  with children-indentation = (+ current-indentation indentation)
@@ -322,7 +374,7 @@
   (paint-generic-tree-pane-node
    (tree-pane-model pane)
    pane
-   (sheet-region pane)
+   (sheet-padding-region pane)
    0
    (indentation pane)))
 
@@ -375,7 +427,7 @@ Returns :select or :deselect, depending on what action was performed."
   "Given a pointer event, determine what item in the pane it has fallen upon. 
 Returns two values, the item itself, and the index within the item list."
   (declare (ignore mx))
-  (with-bounding-rectangle* (sx0 sy0 sx1 sy1)  (sheet-region pane)
+  (with-bounding-rectangle* (sx0 sy0 sx1 sy1)  (sheet-padding-region pane)
     (declare (ignorable sx0 sx1 sy1))
     (let ((items (generic-tree-pane-items pane)))
       (let* ((item-height (generic-tree-pane-item-height pane))
