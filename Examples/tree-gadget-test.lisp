@@ -60,11 +60,14 @@
                      (list "Level3C")
                      (list "Level3D"))))))
 
-(clim::run-frame-top-level
- (clim::make-application-frame 'tree-test))
+(defun tree-gadget-basic-example ()
+  (clim::run-frame-top-level
+   (clim::make-application-frame 'tree-test)))
 
-(clim::run-frame-top-level
- (clim::make-application-frame 'tree-test :tree (subclasses-tree (find-class 'standard-object))))
+(defun tree-gadget-classes-example ()
+  (clim::run-frame-top-level
+   (clim::make-application-frame 'tree-test :tree (subclasses-tree (find-class 'standard-object)))))
 
-(clim::run-frame-top-level
- (clim::make-application-frame 'tree-test :tree (climi::make-directory-node #p"/home/")))
+(defun tree-gadget-directory-example ()
+  (clim::run-frame-top-level
+   (clim::make-application-frame 'tree-test :tree (climi::make-directory-node #p"/home/"))))
