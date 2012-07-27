@@ -314,9 +314,19 @@
     (labels ((node-width (node indentation)
                (+ (padding-left item-padding)
                   indentation
+                  (if (item-icon-size pane)
+                      (+
+                       (padding-left item-icon-padding)
+                       (car (item-icon-size pane))
+                       (padding-right item-icon-padding))
+                      (+ 
+                       (padding-left item-arrow-padding)
+                       8 ;; arrow width
+                       (padding-right item-arrow-padding)))
+                  (padding-left item-name-padding)
                   (text-size (sheet-medium pane)
                              (funcall name-key node))
-                  (padding-right item-padding)))
+                  (padding-right item-name-padding)))
              (tree-width (tree current-indentation)
                (with-tree-node (node children) tree
                  (max (node-width node current-indentation)
@@ -350,7 +360,10 @@
   (with-bounding-rectangle* (x0 y0 x1 y1) region
     (let ((item-height (generic-tree-pane-item-height pane))
           (highlight-ink (tree-pane-highlight-ink pane))
-          (item-padding (item-padding pane)))
+          (item-padding (item-padding pane))
+          (item-arrow-padding (item-arrow-padding pane))
+          (item-name-padding (item-name-padding pane))
+          (item-icon-padding (item-icon-padding pane)))
       (with-tree-node (value children) node
         (multiple-value-bind (background foreground)
             (cond ((not (slot-boundp pane 'value))
@@ -368,46 +381,69 @@
         
           (draw-rectangle* pane x0 y0 x1 (+ y0 item-height) :filled t :ink background)
 
-          ;; Draw corresponding arrow
-          (let* ((arrow-width 8)
-                 (arrow-height 8)
-                 (arrow-x (+ x0 current-indentation))
-                 (arrow-y (- (+ y0 (/ item-height 2)) (/ arrow-height 2)))
-                 (arrow-region (make-bounding-rectangle arrow-x
-                                                        arrow-y
-                                                        (+ arrow-x arrow-width)
-                                                        (+ arrow-y arrow-height))))
-            (when (node-children node)
-              (if (member value (opened-nodes pane) :test (tree-pane-test pane))
-                  (draw-down-arrow pane arrow-region)
-                  (draw-right-arrow pane arrow-region)))
+          ;; Draw corresponding arrow or icon
+          (let ((next-x
+                 (if (item-icon-function pane)
+                     (let ((icon (funcall (item-icon-function pane)
+                                          node
+                                          (member node (opened-nodes pane) :test (tree-pane-test pane)))))
+                       (if icon
+                           (progn
+                             (draw-pattern* pane icon
+                                            (+ x0 current-indentation (padding-left item-icon-padding))
+                                            (- (+ y0 (/ item-height 2)) (/ (pattern-height icon) 2)))
+                             (+ x0 current-indentation
+                                (padding-left item-icon-padding)
+                                (pattern-width icon)
+                                (padding-right item-icon-padding)))
+                           (+ x0 current-indentation)))
+                     (if (node-children node)
+                         (let* ((arrow-width 8)
+                                (arrow-height 8)
+                                (arrow-x (+ x0 current-indentation (padding-left item-arrow-padding)))
+                                (arrow-y (- (+ y0 (/ item-height 2)) (/ arrow-height 2)))
+                                (arrow-region (make-bounding-rectangle arrow-x
+                                                                       arrow-y
+                                                                       (+ arrow-x arrow-width)
+                                                                       (+ arrow-y arrow-height))))
+                           
+                           (if (member value (opened-nodes pane) :test (tree-pane-test pane))
+                               (draw-down-arrow pane arrow-region)
+                               (draw-right-arrow pane arrow-region))
+                           (+ x0 current-indentation
+                              (padding-left item-arrow-padding)
+                              arrow-width
+                              (padding-right item-arrow-padding)))
+                         (+ x0 current-indentation)))))
 
             ;; Draw the item text
             (draw-text* pane (funcall (tree-pane-name-key pane) value)
-                        (+ x0 current-indentation arrow-width 5)
-                        (+ y0 (text-style-ascent (pane-text-style pane) pane)
-                           (padding-top item-padding))
-                      :ink foreground
-                      :text-style (pane-text-style pane)))
+                        next-x
+                        (+ y0
+                           (padding-top item-padding)
+                           (padding-top item-name-padding)
+                           (text-style-ascent (pane-text-style pane) pane))
+                        :ink foreground
+                        :text-style (pane-text-style pane))))
 
-          ;; Draw the node's children y the node is opened
+        ;; Draw the node's children y the node is opened
 
-          (let ((next-region (make-bounding-rectangle x0
-                                                      (+ y0 item-height)
-                                                      x1
-                                                      y1)))
-            (when (member value (opened-nodes pane) :test (tree-pane-test pane))
-              (loop
-                 with children-indentation = (+ current-indentation indentation)
-                 for child in children
-                 do
-                   (setf next-region
-                         (paint-generic-tree-pane-node child
-                                                       pane
-                                                       next-region
-                                                       children-indentation
-                                                       indentation))))
-            (return-from paint-generic-tree-pane-node next-region)))))))
+        (let ((next-region (make-bounding-rectangle x0
+                                                    (+ y0 item-height)
+                                                    x1
+                                                    y1)))
+          (when (member value (opened-nodes pane) :test (tree-pane-test pane))
+            (loop
+               with children-indentation = (+ current-indentation indentation)
+               for child in children
+               do
+               (setf next-region
+                     (paint-generic-tree-pane-node child
+                                                   pane
+                                                   next-region
+                                                   children-indentation
+                                                   indentation))))
+          (return-from paint-generic-tree-pane-node next-region))))))
           
 
 (defmethod handle-repaint ((pane generic-tree-pane) region)
