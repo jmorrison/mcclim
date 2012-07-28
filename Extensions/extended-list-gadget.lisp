@@ -4,8 +4,8 @@
 
 (defclass extended-list-pane (generic-list-pane sheet-padding-mixin)
   ((item-icon-function :initarg :item-icon-function
-                       :initform (lambda (item)
-                                   (declare (ignore item))
+                       :initform (lambda (item selected-p)
+                                   (declare (ignore item selected-p))
                                    nil)
                        :accessor item-icon-function)
    (item-icon-size :initarg :item-icon-size
