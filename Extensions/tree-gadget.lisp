@@ -204,9 +204,7 @@
                 :accessor indentation
                 :documentation "Indentation size for displaying the tree")
    (item-icon-function :initarg :item-icon-function
-                       :initform (lambda (item opened-p)
-                                   (declare (ignore item opened-p))
-                                   nil)
+                       :initform nil
                        :accessor item-icon-function)
    (item-icon-size :initarg :item-icon-size
                    :initform nil
@@ -217,7 +215,7 @@
                  :documentation "The displayed items padding")
    (item-arrow-padding :initarg :item-arrow-padding
                        :accessor item-arrow-padding
-                       :initform (make-empty-padding))
+                       :initform (make-padding 5 5 5 5))
    (item-name-padding :initarg :item-name-padding
                       :initform (make-empty-padding)
                       :accessor item-name-padding)
