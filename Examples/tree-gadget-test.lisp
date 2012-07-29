@@ -118,4 +118,5 @@
 
 (defun tree-gadget-directory-icons-example ()
   (clim::run-frame-top-level
-   (clim::make-application-frame 'tree-test-directory-icon :tree (climi::make-directory-node #p"/home/"))))
+   (clim::make-application-frame 'tree-test-directory-icon
+                                 :tree (climi::make-directory-node #p"/home/"))))
