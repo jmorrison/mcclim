@@ -29,10 +29,11 @@
   (:menu-bar t)
   (:layouts
    (default
-       (vertically (:width 500 :height 500)
+       (vertically (:width 1000 :height 800)
          (4/6
           (horizontally ()
-            (1/5 projects-navigator)
+            (1/5 (scrolling ()
+                   projects-navigator))
             (make-pane 'clim-extensions:box-adjuster-gadget)
             (4/5
              (clim-tab-layout:with-tab-layout ('clim-tab-layout:tab-page :name 'source-files-layout :height 500)
