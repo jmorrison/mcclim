@@ -44,9 +44,52 @@
          (make-pane 'clim-extensions:box-adjuster-gadget)
          (1/6 interactor)))))
 
-(defclass projects-navigator-pane (application-pane)
-  ())
+(defvar *projects* nil)
 
+(defclass project ()
+  ((name :initarg :name
+         :accessor name
+         :initform (error "Provide the name"))
+   (pathname :initarg :pathname
+             :accessor project-pathname
+             :initform (error "Provide the pathname"))))
+
+(defmethod print-object ((project project) stream)
+  (print-unreadable-object (project stream :type t :identity t)
+    (format stream "~A" (name project))))
+
+(push (make-instance 'project
+                     :name "mcclim"
+                     :pathname #p"/home/marian/src/lisp/mcclim/")
+      *projects*)
+
+(push 
+ (make-instance 'project
+                :name "cl-config"
+                :pathname #p"/home/marian/src/lisp/cl-config/")
+ *projects*)
+
+(defmethod climi::node-value ((project project))
+  (name project))
+
+(defmethod climi::node-children ((project project))
+  (list
+   (cons "Source"
+         (list (make-instance 'climi::directory-node :pathname (project-pathname project))))
+   (cons "Settings" nil)
+   (cons "Documentation" nil)
+   (cons "Tests" nil)))
+
+(defclass projects-navigator-pane (climi::generic-tree-pane)
+  ()
+  (:default-initargs
+   :item-padding (climi::make-padding 5 5 5 5)))
+
+(defmethod initialize-instance :after ((projects-navigator projects-navigator-pane) &rest initargs)
+  (declare (ignore initargs))
+  (setf (climi::tree-pane-model projects-navigator)
+        (cons "Projects" *projects*)))
+              
 (defclass source-files-pane (application-pane)
   ())
 
