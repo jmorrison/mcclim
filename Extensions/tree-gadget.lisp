@@ -217,7 +217,7 @@
                  :documentation "The displayed items padding")
    (item-arrow-padding :initarg :item-arrow-padding
                        :accessor item-arrow-padding
-                       :initform (make-padding 5 5 5 5))
+                       :initform (make-padding 5 5 5 0))
    (item-name-padding :initarg :item-name-padding
                       :initform (make-empty-padding)
                       :accessor item-name-padding)
