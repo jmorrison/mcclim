@@ -204,8 +204,8 @@
                 :accessor indentation
                 :documentation "Indentation size for displaying the tree")
    (item-icon-function :initarg :item-icon-function
-                       :initform (lambda (item)
-                                   (declare (ignore item))
+                       :initform (lambda (item opened-p)
+                                   (declare (ignore item opened-p))
                                    nil)
                        :accessor item-icon-function)
    (item-icon-size :initarg :item-icon-size
