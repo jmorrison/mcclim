@@ -99,7 +99,9 @@
     (format stream "~A" (directory-pathname node))))
 
 (defmethod node-value ((node directory-node))
-  (princ-to-string (directory-pathname node)))
+  (if (pathname-name (directory-pathname node))
+      (pathname-name (directory-pathname node))
+      (first (last (pathname-directory (directory-pathname node))))))
 
 (defmethod node-children ((node directory-node))
   (when (not (pathname-name (directory-pathname node)))
