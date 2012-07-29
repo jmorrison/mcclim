@@ -87,6 +87,7 @@
 
 (defmethod initialize-instance :after ((projects-navigator projects-navigator-pane) &rest initargs)
   (declare (ignore initargs))
+  (setf (climi::tree-pane-test projects-navigator) #'equalp)
   (setf (climi::tree-pane-model projects-navigator)
         (cons "Projects" *projects*)))
               

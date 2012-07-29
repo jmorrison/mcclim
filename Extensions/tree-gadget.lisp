@@ -155,7 +155,7 @@
 			  :documentation "A function to be applied to items to find the presentation types for their values, or NIL.")
    (test        :initarg :test
                 :initform #'eql
-                :reader tree-pane-test
+                :accessor tree-pane-test
                 :documentation "A function to compare two items for equality.")))
 
 (defun draw-right-arrow (sheet region &key (ink +blue+))
