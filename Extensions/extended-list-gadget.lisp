@@ -1,8 +1,8 @@
 (in-package :climi)
 
-(define-abstract-pane-mapping 'list-pane 'extended-list-pane)
+(define-abstract-pane-mapping 'list-pane 'generic-list-pane*)
 
-(defclass extended-list-pane (generic-list-pane sheet-padding-mixin)
+(defclass generic-list-pane* (generic-list-pane sheet-padding-mixin)
   ((item-icon-function :initarg :item-icon-function
                        :initform (lambda (item selected-p)
                                    (declare (ignore item selected-p))
@@ -21,9 +21,9 @@
    (item-icon-padding :initarg :item-icon-padding
                       :initform (make-empty-padding)
                       :accessor item-icon-padding))
-  (:documentation "The extended-list-pane implementation handles padding and icons"))
+  (:documentation "An extended list-pane implementation that handles padding and icons"))
 
-(defmethod generic-list-pane-items-width ((pane extended-list-pane))
+(defmethod generic-list-pane-items-width ((pane generic-list-pane*))
   (with-slots (items-width) pane
     (or items-width
         (setf items-width
@@ -41,13 +41,13 @@
                          :initial-value 0)
                  (padding-right (item-name-padding pane)))))))
 
-(defmethod generic-list-pane-item-height ((pane extended-list-pane))
+(defmethod generic-list-pane-item-height ((pane generic-list-pane*))
   (+ (padding-top (item-padding pane))
      (text-style-ascent  (pane-text-style pane) pane)
      (text-style-descent (pane-text-style pane) pane)
      (padding-bottom (item-padding pane))))
 
-(defmethod handle-repaint ((pane extended-list-pane) region)
+(defmethod handle-repaint ((pane generic-list-pane*) region)
   ;; Clear the region first. 
   (with-bounding-rectangle* (x0 y0 x1 y1) (sheet-region pane)
     (draw-rectangle* pane x0 y0 x1 y1
