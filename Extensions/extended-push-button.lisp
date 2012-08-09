@@ -101,4 +101,4 @@
               (draw-pattern* pane
                              (icon pane)
                              (+ x1 (space-requirement-width label-space) (padding-left (icon-padding pane)))
-                             (+ y1 (padding-top (icon-padding pane))))))))))))
+                             (- (+ y1 (/ (- y2 y1) 2)) (/ (pattern-height (icon pane)) 2)))))))))))
