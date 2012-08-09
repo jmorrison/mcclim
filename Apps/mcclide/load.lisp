@@ -18,7 +18,8 @@
   (load (merge-pathnames "file-selector.lisp" extensions-directory))
   (load (merge-pathnames "sheet-padding-mixin.lisp" extensions-directory))
   (load (merge-pathnames "tree-gadget.lisp" extensions-directory))
-  
+  (load (merge-pathnames "extended-list-gadget.lisp" extensions-directory))
+  (load (merge-pathnames "extended-push-button.lisp" extensions-directory))
   (load (merge-pathnames "package.lisp" mcclide-directory))
   (load (merge-pathnames "asdf.lisp" mcclide-directory))
   (load (merge-pathnames "quicklisp.lisp" mcclide-directory))
