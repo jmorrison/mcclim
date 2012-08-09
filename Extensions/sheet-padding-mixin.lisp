@@ -67,3 +67,7 @@
                                (+ y0 (sheet-padding-top sheet))
                                (- x1 (sheet-padding-right sheet))
                                (- y1 (sheet-padding-bottom sheet))))))
+
+(defmacro with-padding (bindings padding &body body)
+  `(destructuring-bind ,bindings ,padding
+     ,@body))
