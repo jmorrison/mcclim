@@ -7,7 +7,7 @@
                         :initform nil))
   (:panes
    (projects-navigator (make-pane 'projects-navigator-pane))
-   (source-files :text-editor-pane)
+   (source-files (make-pane 'source-editor-pane :active t))
    (source-file-2 :text-editor-pane)
    (lisp-interaction (make-pane 'lisp-interaction-pane))
    (output :application-pane)
@@ -44,6 +44,17 @@
           lisp-interaction)
          (make-pane 'clim-extensions:box-adjuster-gadget)
          (1/6 interactor)))))
+
+(defclass source-editor-pane (drei::drei-pane)
+  ()
+  (:metaclass drei::modual-class)
+  (:default-initargs
+   :view (make-instance 'drei::textual-drei-syntax-view
+                        :buffer (make-instance 'climacs::climacs-buffer))
+   :display-time :command-loop
+   :text-style climacs::*climacs-text-style*
+   :width 900 :height 400))
+
 
 (defvar *projects* nil)
 
@@ -98,6 +109,11 @@
 (defclass lisp-interaction-pane (application-pane)
   ())
 
+(defun fetch-icon (filename)
+  (make-pattern-from-bitmap-file
+   (asdf::system-relative-pathname :mcclim (concatenate 'string "Extensions/icons/" filename))
+   :format :xpm :port nil))
+
 (define-command-table project-commands :inherit-from nil)
 
 (define-command-table lisp-interaction-commands :inherit-from nil)
@@ -136,17 +152,27 @@
 
 (define-command (com-about-mcclide :name "About"
                                    :command-table help-commands
-                                   :menu t)
+                                   :menu (list "About" :icon (fetch-icon "help-about.xpm")))
     ()
   (run-frame-top-level
    (make-application-frame 'about-dialog)))
 
-(define-command (com-room :name "Room"
-                          :command-table help-commands
-                          :menu t)
+(define-command (com-system-information :name "System information"
+                                        :command-table help-commands
+                                        :menu (list "System information" :icon (fetch-icon "dialog-information-3.xpm")))
     ()
   (run-frame-top-level
    (make-application-frame 'room-dialog)))
+
+(define-command (com-help-manual :name "Manual"
+                                        :command-table help-commands
+                                        :menu (list "Manual" :icon (fetch-icon "documentation.xpm")))
+    ())
+
+(define-command (com-system-help :name "Help"
+                                        :command-table help-commands
+                                        :menu (list "Help" :icon (fetch-icon "help.xpm")))
+    ())
 
 (define-command-table tools-commands
     :inherit-from nil
@@ -168,32 +194,35 @@
 
 (define-command (com-new-file :name "New file"
                               :command-table file-commands
-                              :menu t)
+                              :menu (list "New file" :icon (fetch-icon "document-new-5.xpm")))
     ())
 
 (define-command (com-open-file :name "Open file"
                                :command-table file-commands
-                               :menu t)
+                               :menu (list "Open file" :icon (fetch-icon "document-open-2.xpm")))
     ()
   (file-selector:select-file :own-window t :pathname-type "lisp" :style 'list))
+
+(define-command (com-save-file :name "Save file"
+                               :command-table file-commands
+                               :menu (list "Save file" :icon (fetch-icon "document-export.xpm")))
+    ())
 
 (define-command-table edit-commands :inherit-from nil)
 
 (define-command (com-edit-settings :name "Settings"
                                    :command-table edit-commands
-                                   :menu `("Settings" :icon ,(make-pattern-from-bitmap-file
-                                                            (asdf::system-relative-pathname :mcclim #p"Extensions/icons/preferences-system-4.xpm")
-                                                            :format :xpm :port nil)))
+                                   :menu (list "Settings" :icon (fetch-icon "preferences-system-2.xpm")))
     ())
 
 (define-command (com-edit-preferences :name "Preferences"
                                       :command-table edit-commands
-                                      :menu t)
+                                      :menu (list "Preferences" :icon (fetch-icon "applications-system.xpm")))
     ())
 
 (define-command (com-new-project :name "New project"
                                  :command-table project-commands
-                                 :menu t)
+                                 :menu (list "New project" :icon (fetch-icon "application-new.xpm")))
   ())
 
 (define-command (com-open-project :name "Open project"
