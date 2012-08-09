@@ -181,7 +181,9 @@
 
 (define-command (com-edit-settings :name "Settings"
                                    :command-table edit-commands
-                                   :menu t)
+                                   :menu `("Settings" :icon ,(make-pattern-from-bitmap-file
+                                                            (asdf::system-relative-pathname :mcclim #p"Extensions/icons/preferences-system-4.xpm")
+                                                            :format :xpm :port nil)))
     ())
 
 (define-command (com-edit-preferences :name "Preferences"
