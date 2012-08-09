@@ -43,9 +43,19 @@
                                                        :max-width (* 2 (pane-x-spacing gadget))
                                                        :min-height (* 2 (pane-y-spacing gadget))
                                                        :height (* 2 (pane-y-spacing gadget))
-                                                       :max-height (* 2 (pane-y-spacing gadget)))))
-    (space-requirement+* (space-requirement+ label-space-requirement
-                                             icon-space-requirement)
+                                                       :max-height (* 2 (pane-y-spacing gadget))))
+         (inside-space-requirement (let ((width (+ (space-requirement-width label-space-requirement)
+                                                   (space-requirement-width icon-space-requirement)))
+                                         (height (max (space-requirement-height label-space-requirement)
+                                                      (space-requirement-height icon-space-requirement))))
+                                           (make-space-requirement :width width
+                                                                   :min-width width
+                                                                   :max-width width
+                                                                   :height height
+                                                                   :min-height height
+                                                                   :max-height height))))
+                                                           
+    (space-requirement+* inside-space-requirement
                          :min-width (* 2 *3d-border-thickness*)
                          :width (* 2 *3d-border-thickness*)
                          :max-width (* 2 *3d-border-thickness*)
@@ -73,7 +83,7 @@
                        (draw-pattern* pane
                                       (icon pane)
                                       (+ x1 (padding-left (icon-padding pane)))
-                                      (+ y1 (padding-top (icon-padding pane))))
+                                      (- (+ y1 (/ (- y2 y1) 2)) (/ (pattern-height (icon pane)) 2)))
                        (+ x1
                           (padding-left (icon-padding pane))
                           (pattern-width (icon pane))
