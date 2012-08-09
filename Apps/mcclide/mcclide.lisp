@@ -186,7 +186,8 @@
     ()
     (clim-fiveam::test-runner))
 
-(define-command (com-run-system-browser :command-table tools-commands)
+(define-command (com-run-system-browser :command-table tools-commands
+                                        :menu (list "System browser" :icon (fetch-icon "view-sidetree-3.xpm")))
     ()
   (clim-system-browser::system-browser))
 
