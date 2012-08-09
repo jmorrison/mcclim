@@ -1,0 +1,27 @@
+(defpackage mcclide-load
+  (:use :cl))
+
+(in-package :mcclide-load)
+
+(let ((mcclide-directory (asdf::system-relative-pathname :mcclim #p"Apps/mcclide/"))
+      (extensions-directory (asdf::system-relative-pathname :mcclim #p"Extensions/"))
+      (browser-directory (asdf::system-relative-pathname :mcclim #p"Apps/SystemBrowser/")))
+  (require :mcclim)
+  (require :mcclim-truetype)
+  (require :clim-listener)
+  (require :climacs)
+  (require :fiveam)
+  (load (merge-pathnames "system-browser.lisp" browser-directory))
+  (load (merge-pathnames "class-browser-2.lisp" browser-directory))
+  (load (merge-pathnames "class-browser.lisp" browser-directory))
+  (load (merge-pathnames "fiveam.lisp" browser-directory))
+  (load (merge-pathnames "file-selector.lisp" extensions-directory))
+  (load (merge-pathnames "sheet-padding-mixin.lisp" extensions-directory))
+  (load (merge-pathnames "tree-gadget.lisp" extensions-directory))
+  
+  (load (merge-pathnames "package.lisp" mcclide-directory))
+  (load (merge-pathnames "asdf.lisp" mcclide-directory))
+  (load (merge-pathnames "quicklisp.lisp" mcclide-directory))
+  (load (merge-pathnames "mcclide.lisp" mcclide-directory))
+  (format t "McCLIDE has been loaded. Evaluate:: (mmcclide::mcclide)")
+  )
