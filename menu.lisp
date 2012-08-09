@@ -284,6 +284,7 @@ account, and create a list of menu buttons."
 	(type (command-menu-item-type item))
 	(value (command-menu-item-value item))
 	(frame *application-frame*)
+        (icon (command-menu-item-icon item))
 	(manager (frame-manager *application-frame*)))
     (case type
       (:command
@@ -292,6 +293,7 @@ account, and create a list of menu buttons."
              (make-pane-1 manager frame 'menu-button-leaf-pane
                           :label name
                           :text-style *enabled-text-style*
+                          :icon icon
                           :client client
                           :vertical vertical
                           :value-changed-callback
@@ -301,6 +303,7 @@ account, and create a list of menu buttons."
              (let ((pane (make-pane-1 manager frame 'menu-button-leaf-pane
                             :label name
                             :text-style *disabled-text-style*
+                            :icon icon
                             :client client
                             :vertical vertical
                             :value-changed-callback
@@ -313,6 +316,7 @@ account, and create a list of menu buttons."
         (make-pane-1 manager frame 'menu-button-leaf-pane
                      :label name
                      :text-style *enabled-text-style*
+                     :icon icon
                      :client client
                      :vertical vertical
                      :value-changed-callback
@@ -334,6 +338,7 @@ account, and create a list of menu buttons."
                                        'menu-button-vertical-submenu-pane
                                        'menu-button-submenu-pane)
 		     :label name
+                     :icon icon
 		     :client client
                      :vertical vertical
 		     :frame-manager manager
