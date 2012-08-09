@@ -17,51 +17,51 @@
    (icon-padding :initarg :icon-padding
                  :accessor icon-padding
                  :initform (make-padding 3 3 3 3)))
-  (:default-initargs
-   :align-x nil ;; Don't center the label by default
-    ))
+  )
 
 (define-abstract-pane-mapping 'push-button 'push-button-pane*)
 
 (defmethod compose-space ((gadget push-button-pane*) &key width height)
   (declare (ignore width height))
-  (let* ((icon-space-width (+ (padding-left (icon-padding gadget))
-                              (pattern-width (icon gadget))
-                              (padding-right (icon-padding gadget))))
-         (icon-space-height (+ (padding-top (icon-padding gadget))
-                               (pattern-height (icon gadget))
-                               (padding-bottom (icon-padding gadget))))
-         (icon-space-requirement (make-space-requirement :width icon-space-width
-                                             :min-width icon-space-width
-                                             :max-width icon-space-width
-                                             :height icon-space-height
-                                             :min-height icon-space-height
-                                             :max-height icon-space-height))
-         (label-space-requirement (space-requirement+* (compose-label-space gadget)
-                                                       :min-width (* 2 (pane-x-spacing gadget))
-                                                       :width (* 2 (pane-x-spacing gadget))
-                                                       :max-width (* 2 (pane-x-spacing gadget))
-                                                       :min-height (* 2 (pane-y-spacing gadget))
-                                                       :height (* 2 (pane-y-spacing gadget))
-                                                       :max-height (* 2 (pane-y-spacing gadget))))
-         (inside-space-requirement (let ((width (+ (space-requirement-width label-space-requirement)
-                                                   (space-requirement-width icon-space-requirement)))
-                                         (height (max (space-requirement-height label-space-requirement)
-                                                      (space-requirement-height icon-space-requirement))))
-                                           (make-space-requirement :width width
-                                                                   :min-width width
-                                                                   :max-width width
-                                                                   :height height
-                                                                   :min-height height
-                                                                   :max-height height))))
+  (if (not (icon gadget))
+      (call-next-method)
+      (let* ((icon-space-width (+ (padding-left (icon-padding gadget))
+                                  (pattern-width (icon gadget))
+                                  (padding-right (icon-padding gadget))))
+             (icon-space-height (+ (padding-top (icon-padding gadget))
+                                   (pattern-height (icon gadget))
+                                   (padding-bottom (icon-padding gadget))))
+             (icon-space-requirement (make-space-requirement :width icon-space-width
+                                                             :min-width icon-space-width
+                                                             :max-width icon-space-width
+                                                             :height icon-space-height
+                                                             :min-height icon-space-height
+                                                             :max-height icon-space-height))
+             (label-space-requirement (space-requirement+* (compose-label-space gadget)
+                                                           :min-width (* 2 (pane-x-spacing gadget))
+                                                           :width (* 2 (pane-x-spacing gadget))
+                                                           :max-width (* 2 (pane-x-spacing gadget))
+                                                           :min-height (* 2 (pane-y-spacing gadget))
+                                                           :height (* 2 (pane-y-spacing gadget))
+                                                           :max-height (* 2 (pane-y-spacing gadget))))
+             (inside-space-requirement (let ((width (+ (space-requirement-width label-space-requirement)
+                                                       (space-requirement-width icon-space-requirement)))
+                                             (height (max (space-requirement-height label-space-requirement)
+                                                          (space-requirement-height icon-space-requirement))))
+                                         (make-space-requirement :width width
+                                                                 :min-width width
+                                                                 :max-width width
+                                                                 :height height
+                                                                 :min-height height
+                                                                 :max-height height))))
                                                            
-    (space-requirement+* inside-space-requirement
-                         :min-width (* 2 *3d-border-thickness*)
-                         :width (* 2 *3d-border-thickness*)
-                         :max-width (* 2 *3d-border-thickness*)
-                         :min-height (* 2 *3d-border-thickness*)
-                         :height (* 2 *3d-border-thickness*)
-                         :max-height (* 2 *3d-border-thickness*))))
+        (space-requirement+* inside-space-requirement
+                             :min-width (* 2 *3d-border-thickness*)
+                             :width (* 2 *3d-border-thickness*)
+                             :max-width (* 2 *3d-border-thickness*)
+                             :min-height (* 2 *3d-border-thickness*)
+                             :height (* 2 *3d-border-thickness*)
+                             :max-height (* 2 *3d-border-thickness*)))))
 
 (defmethod handle-repaint ((pane push-button-pane*) region)
   (declare (ignore region))
