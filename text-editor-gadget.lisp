@@ -99,6 +99,10 @@
   ;; Hm! I wonder if this can cause trouble.  I think not.
   (drei:display-drei gadget))
 
+(defmethod handle-event :around ((gadget drei-editor-substrate) (event keyboard-event))
+  (when (editable-p (user-gadget gadget))
+    (call-next-method)))
+
 (defclass drei-text-field-substrate (text-field-substrate-mixin
                                      drei-editor-substrate)
   ()
@@ -194,6 +198,10 @@
     (when (and previous (typep previous 'gadget))
       (disarmed-callback previous (gadget-client previous) (gadget-id previous)))
     (armed-callback gadget (gadget-client gadget) (gadget-id gadget))))
+
+(defmethod handle-event :around ((gadget goatee-editor-substrate) (event keyboard-event))
+  (when (editable-p (user-gadget gadget))
+    (call-next-method)))
 
 (defmethod armed-callback :after ((gadget goatee-editor-substrate) client id)
   (declare (ignore client id))

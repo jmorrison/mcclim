@@ -8,6 +8,7 @@
 ;;; Lionel Salabartan (salabart@emi.u-bordeaux.fr)
 ;;;  (c) copyright 2001 by Michael McDonald (mikemac@mikemac.com)
 ;;;  (c) copyright 2001 by Gilbert Baumann <unk6@rz.uni-karlsruhe.de>
+;;;  (c) copyright 2012 by O.Nixie <onixie@gmail.com>
 
 ;;; This library is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Library General Public
@@ -613,9 +614,16 @@ and must never be nil."))
   (:default-initargs :value ""))
 
 (defmethod initialize-instance :after ((gadget text-field) &rest rest)
+  (setf (slot-value gadget 'editable-p) (getf rest :editable-p t))
   (unless (getf rest :normal)
     (setf (slot-value gadget 'current-color) +white+
           (slot-value gadget 'normal) +white+)))
+
+(defmethod activate-gadget :after ((gadget text-field))
+  (setf (slot-value gadget 'editable-p) t))
+
+(defmethod deactivate-gadget :after ((gadget text-field))
+  (setf (slot-value gadget 'editable-p) nil))
 
 ;;; 30.4.9 The abstract text-editor Gadget
 
