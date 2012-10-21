@@ -32,5 +32,5 @@
   (load (merge-pathnames "extended-push-button-test.lisp" examples-directory))
   (load (merge-pathnames "tree-gadget-test.lisp" examples-directory))
   (load (merge-pathnames "clim-inspector/clim-inspector.lisp" experimental-directory))
-  (format t "McCLIDE has been loaded. Evaluate:: (mmcclide::mcclide)")
+  (format t "McCLIDE has been loaded. Evaluate:: (mcclide:mcclide)")
   )

@@ -1,2 +1,3 @@
 (defpackage mcclide
-  (:use :clim :clim-lisp))
+  (:use :clim :clim-lisp)
+  (:export #:mcclide))
