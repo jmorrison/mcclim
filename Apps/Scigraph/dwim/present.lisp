@@ -253,10 +253,23 @@ advised of the possiblity of such damages.
 (clim::define-accept-values-command (com-exit-avv :keystroke #\control-\d) ()
   (invoke-restart 'clim::frame-exit))
 
+;;
+;; DWIM defines its own accepting-values macro in macros.lisp which
+;; has an "if" form (enclosing a restart-case form) which returns
+;; either :abort or t, neither of which is of type list, which the
+;; following, enclosing values-list form wants.  SBCL is (now?) clever
+;; enough to spot this and refuse to compile it.  Frankly, I am not
+;; smart enough to figure out the original programmers' intentions, as
+;; there appear to be no calls to this function within the code base.
+;; So I just commented out the values-list, and propagate back the
+;; return value as-is.  Sorry.  Will try to fix later. -jm
+;;
+
 (defun accept-values (descriptions &key (prompt nil)
 					(stream *query-io*)
 					(own-window nil))
-  (values-list
+  (#-sbcl values-list
+   #+sbcl progn				; -jm
    (accepting-values 
     (stream :own-window own-window :label prompt)
     (mapcar #'(lambda (description)

@@ -39,7 +39,9 @@ advised of the possiblity of such damages.
   #-allegro (:nicknames gr)           ; "GR" names something already.
   (:shadow variable)                  ; shouldn't be inherited but is
   #+MCL     (:shadow copy)
-  (:use dwim-lisp tool statistics))
+  (:use dwim-lisp tool statistics)
+  #+mcclim(:shadow :point)	; Point already defined in McCLIM. -jm
+  )
 
 (in-package :graph)
 
