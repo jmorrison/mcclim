@@ -61,6 +61,7 @@
   location of the Bitstream Vera family of fonts on disk. If you
   don't have them, get them from http://www.gnome.org/fonts/~%"))
 
+#|
 (defun find-fontconfig-font (font-fc-name)
   (with-input-from-string
       (s (with-output-to-string (asdf::*verbose-out*)
@@ -68,6 +69,19 @@
 	     (unless (zerop code)
 	       (warn "~&fc-match failed with code ~D.~%" code)))))
     (parse-fontconfig-output s)))
+
+;; Well, this was the original.
+;; The one below seems to work, and shows truetype fonts under CCL.
+;; -jm
+|#
+
+(defun find-fontconfig-font (font-fc-name)
+  (with-input-from-string
+   (s (with-output-to-string (match-output)
+			     (asdf/run-program:run-program
+			      (format nil "fc-match -v \"~A\"" font-fc-name)
+			      :output match-output)))
+   (parse-fontconfig-output s)))
 
 (defun fontconfig-name (family face) 
   (format nil "~A:~A" family face))

@@ -2484,14 +2484,14 @@ returned in its place."
   (declare (list list))
   (coerce list 'simple-vector))
 
-(defconstant +comma-marker+ (gensym "COMMA")
+(defparameter +comma-marker+ (gensym "COMMA")
   "The marker used for identifying commas.")
-(defconstant +comma-at-marker+ (gensym "COMMA-AT")
+(defparameter +comma-at-marker+ (gensym "COMMA-AT")
   "The marker used for identifying ,@ contructs.")
-(defconstant +comma-dot-marker+ (gensym "COMMA-DOT")
+(defparameter +comma-dot-marker+ (gensym "COMMA-DOT")
   "The marker used for identifying ,. contructs.")
 
-(defconstant +clobberable-marker+ (gensym "CLOBBERABLE")
+(defparameter +clobberable-marker+ (gensym "CLOBBERABLE")
   "Marker for a constant that we can safely modify
 destructively.")
 
