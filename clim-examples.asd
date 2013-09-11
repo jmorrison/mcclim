@@ -42,3 +42,7 @@
      (:module "Goatee"
 	      :components
 	      ((:file "goatee-test")))))
+
+(defmethod perform :after ((op load-op) (c (eql (find-system :clim-examples))))
+  (pushnew :clim-examples *features*))
+

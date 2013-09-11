@@ -15,3 +15,6 @@
 	      ((:file "package")
 	       (:file "disassembly" :depends-on ("package"))
 	       (:file "inspector" :depends-on ("disassembly"))))))
+
+(defmethod perform :after ((op load-op) (c (eql (find-system :clouseau))))
+  (pushnew :clouseau *features*))

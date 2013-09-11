@@ -356,9 +356,7 @@
 (defsystem :clim
   :depends-on (:clim-core :goatee-core :clim-postscript :drei-mcclim)
   :components
-  ((:file "Goatee/presentation-history" ; XXX: this is loaded as part of the Goatee system. huh?
-          :pathname #.(make-pathname :directory '(:relative "Goatee") :name "presentation-history" :type "lisp"))
-   (:file "input-editing-goatee")
+  ((:file "input-editing-goatee")
    (:file "input-editing-drei")
    (:file "text-editor-gadget")
    (:file "Extensions/tab-layout"
